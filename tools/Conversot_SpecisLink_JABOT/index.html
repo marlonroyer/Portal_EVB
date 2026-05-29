@@ -1,0 +1,1218 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ferramenta para converter dados do SpeciesLink para o formato JABOT">
+    <meta name="theme-color" content="#1a73e8">
+    
+    <title>Conversor SpeciesLink → JABOT</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔄</text></svg>">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* ============================================
+           CONVERSOR SPECIESLINK → JABOT - Design Profissional
+           Paleta Personalizada
+           ============================================ */
+
+        :root {
+            /* Cores Frias (Fundo) */
+            --bg-dark: #0B3F39;
+            --bg-medium: #0E4F45;
+            --bg-teal: #16665A;
+            --bg-light-teal: #1C7F6E;
+            --bg-accent: #2E9987;
+            --bg-highlight: #4BB8A3;
+            
+            /* Cores Quentes (Principal) */
+            --primary-gold: #F3B233;
+            --primary-amber: #F0A92A;
+            --primary-orange: #F17A34;
+            --primary-burnt: #E56A2E;
+            --primary-rust: #C5522A;
+            --primary-red: #C43A2E;
+            
+            /* Cores de Sucesso */
+            --success: #F3B233;
+            --success-light: rgba(243, 178, 51, 0.15);
+            --success-dark: #F0A92A;
+            
+            /* Cores de Erro */
+            --danger: #C43A2E;
+            --danger-light: rgba(196, 58, 46, 0.15);
+            --danger-dark: #A8322A;
+            --danger-bg: #7A1E1B;
+            
+            /* Neutros (Header/Footer) */
+            --cream: #E2C3A6;
+            --cream-dark: #CFA98B;
+            --brown: #8E5E45;
+            --brown-dark: #5C3A2B;
+            --charcoal: #2A2A2A;
+            --near-black: #121212;
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+            --shadow-gold: 0 0 20px rgba(243, 178, 51, 0.3);
+            
+            /* Bordas */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-teal) 50%, var(--bg-light-teal) 100%);
+            min-height: 100vh;
+            color: var(--cream);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .app-header {
+            background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--primary-gold);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--brown-dark);
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--near-black);
+        }
+
+        .logo h1 span {
+            color: var(--primary-rust);
+            font-weight: 300;
+        }
+
+        .subtitle {
+            color: var(--brown);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           MAIN CONTAINER
+           ============================================ */
+        .main-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ============================================
+           CARDS
+           ============================================ */
+        .card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--primary-gold);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg), var(--shadow-gold);
+            transform: translateY(-2px);
+            border-color: var(--primary-amber);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--near-black) 0%, var(--charcoal) 100%);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid var(--primary-rust);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--cream);
+            flex: 1;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            background: rgba(11, 63, 57, 0.3);
+        }
+
+        /* ============================================
+           INSTRUCTIONS CARD
+           ============================================ */
+        .instructions-list {
+            list-style: none;
+            counter-reset: step;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .instructions-list li {
+            counter-increment: step;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(42, 42, 42, 0.3);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--brown);
+            font-size: 0.95rem;
+            color: var(--cream);
+        }
+
+        .instructions-list li::before {
+            content: counter(step);
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-orange));
+            color: var(--near-black);
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+        }
+
+        /* ============================================
+           FORM CONTROLS
+           ============================================ */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--cream);
+            font-size: 0.95rem;
+        }
+
+        .form-group label i {
+            color: var(--primary-gold);
+            width: 20px;
+            text-align: center;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--brown);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(18, 18, 18, 0.8);
+            color: var(--cream);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 10px rgba(243, 178, 51, 0.3);
+        }
+
+        .form-control::placeholder {
+            color: var(--brown);
+        }
+
+        /* ============================================
+           FILE INPUT CUSTOM
+           ============================================ */
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px dashed var(--primary-rust);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: rgba(42, 42, 42, 0.5);
+            color: var(--cream);
+            cursor: pointer;
+        }
+
+        .file-input-wrapper input[type="file"]:hover {
+            border-color: var(--primary-gold);
+            background: rgba(243, 178, 51, 0.1);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .file-input-wrapper input[type="file"]::file-selector-button {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-rust) 100%);
+            color: var(--cream);
+            border: 2px solid var(--primary-gold);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .file-input-wrapper input[type="file"]::file-selector-button:hover {
+            background: linear-gradient(135deg, var(--primary-amber) 0%, var(--primary-orange) 100%);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-convert {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-orange) 100%);
+            color: var(--near-black);
+            border: 2px solid var(--primary-amber);
+            font-weight: 700;
+            width: 100%;
+            justify-content: center;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-convert:hover {
+            background: linear-gradient(135deg, var(--primary-amber) 0%, var(--primary-burnt) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .btn-convert:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ============================================
+           PROGRESS BAR
+           ============================================ */
+        .progress-card {
+            display: none;
+        }
+
+        .progress-info {
+            text-align: center;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        #prog-text {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-label {
+            color: var(--cream-dark);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-wrapper {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 20px;
+            height: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--brown);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-gold) 0%, var(--primary-orange) 50%, var(--primary-rust) 100%);
+            border-radius: 20px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+            box-shadow: 0 0 20px rgba(243, 178, 51, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* ============================================
+           ALERTS
+           ============================================ */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-sm);
+            margin-top: 1rem;
+            display: none;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .alert-error {
+            background: var(--danger-light);
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+            display: block;
+        }
+
+        .alert-warning {
+            background: rgba(243, 178, 51, 0.15);
+            color: var(--primary-amber);
+            border-color: var(--primary-gold);
+            white-space: pre-line;
+            display: block;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert i {
+            margin-right: 0.5rem;
+        }
+
+        .alert-warning-line {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(243, 178, 51, 0.2);
+            font-size: 0.85rem;
+        }
+
+        .alert-warning-line:last-child {
+            border-bottom: none;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .app-footer {
+            background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+            padding: 1.5rem 2rem;
+            margin-top: 2rem;
+            border-top: 3px solid var(--primary-gold);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--near-black);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: var(--primary-rust);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-red);
+            text-decoration: underline;
+        }
+
+        .footer-links i {
+            margin-right: 0.25rem;
+        }
+
+        /* ============================================
+           SCROLLBAR PERSONALIZADA
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(42, 42, 42, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--brown);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-rust);
+        }
+
+        /* ============================================
+           RESPONSIVIDADE
+           ============================================ */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            
+            .progress-stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../shared/tool-standard.css?v=20260528d">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-exchange-alt"></i>
+                <h1>SpeciesLink <span>para JABOT</span></h1>
+            </div>
+            <p class="subtitle">Conversão de dados do SpeciesLink para o padrão JABOT</p>
+        </div>
+    </header>
+
+    <!-- Container Principal -->
+    <main class="main-container">
+        <!-- Card de Instruções -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i>
+                <h2>Como usar</h2>
+            </div>
+            <div class="card-body">
+                <ol class="instructions-list">
+                    <li>Exporte seus dados do SpeciesLink em formato Excel (.xlsx)</li>
+                    <li>Preencha o nome do projeto</li>
+                    <li>Escolha o arquivo e clique em Converter</li>
+                    <li>O arquivo convertido será baixado automaticamente</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Card Principal -->
+        <div class="card" id="mainCard">
+            <div class="card-header">
+                <i class="fas fa-cogs"></i>
+                <h2>Conversão</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="projeto">
+                        <i class="fas fa-project-diagram"></i> Nome do projeto
+                    </label>
+                    <input type="text" id="projeto" class="form-control" placeholder="Ex: Herbário EVB 2026">
+                </div>
+
+                <div class="form-group">
+                    <label for="nomeArquivo">
+                        <i class="fas fa-file-signature"></i> Nome do arquivo de saída
+                    </label>
+                    <input type="text" id="nomeArquivo" class="form-control" placeholder="JABOT_convertido.xlsx">
+                </div>
+
+                <div class="form-group">
+                    <label for="arquivo">
+                        <i class="fas fa-file-excel"></i> Arquivo SpeciesLink (.xlsx)
+                    </label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="arquivo" accept=".xlsx">
+                    </div>
+                </div>
+
+                <button class="btn btn-convert" id="convertBtn" type="button">
+                    <i class="fas fa-sync-alt"></i> Converter e Baixar
+                </button>
+
+                <!-- Alertas -->
+                <div class="alert alert-error" id="error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+                <div class="alert alert-warning" id="warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="warningText"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de Progresso -->
+        <div class="card progress-card" id="progressCard">
+            <div class="card-header">
+                <i class="fas fa-tasks"></i>
+                <h2>Processamento</h2>
+            </div>
+            <div class="card-body">
+                <div class="progress-info">
+                    <div class="progress-stats">
+                        <span id="prog-text">0%</span>
+                        <span class="progress-label">Processando dados...</span>
+                    </div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Herbário Evaldo Buttura</h3>
+                <p>Ferramenta digital de apoio à rotina de coleções botânicas.</p>
+                <p>Uso interno - EVB / UNILA.</p>
+            </div>
+            <div class="footer-section">
+                <h3>SpeciesLink para JABOT</h3>
+                <p>Conversão e organização de dados para importação no sistema JABOT.</p>
+                <p>Versão 2.0 - Maio de 2026.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Desenvolvimento</h3>
+                <p>Marlon Royer de Morais</p>
+                <p>Portal EVB - Ferramentas Digitais.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Herbário Evaldo Buttura. Sistema desenvolvido para organização, processamento e impressão de dados botânicos.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ======================================================
+        // ORDEM OFICIAL DAS COLUNAS JABOT
+        // ======================================================
+
+        const colunasJabot = [
+            "numtombo","sufixo","family","genus","cf","sp1","author1","rank1",
+            "sp2","author2","rank2","sp3","author3","vernacular","typestat",
+            "country","majorarea","minorarea","gazetteer","uc",
+            "latitude","longitude",
+            "lat_grau","lat_min","lat_seg","ns",
+            "long_grau","long_min","long_seg","ew",
+            "altprof","altprofmax","unidmedaltprof",
+            "locnotes","flor","fruto","fuste","altura","unidmedaltura",
+            "collector","number","addcoll","colldd","collmm","collyy",
+            "detby","detdd","detmm","detyy",
+            "sigla_colbot_origem","dups","nrdups",
+            "notes","usos","uso_especifico","projeto",
+            "habitat","habito"
+        ];
+
+        const SELECTORS = {
+            arquivo: "arquivo",
+            projeto: "projeto",
+            nomeArquivo: "nomeArquivo",
+            progressCard: "progressCard",
+            progressText: "prog-text",
+            progressFill: "progressFill",
+            error: "error",
+            errorText: "errorText",
+            warning: "warning",
+            warningText: "warningText",
+            convertBtn: "convertBtn"
+        };
+
+        const BOTAO_CONVERTER_HTML = '<i class="fas fa-sync-alt"></i> Converter e Baixar';
+        const BOTAO_PROCESSANDO_HTML = '<i class="fas fa-spinner fa-spin"></i> Convertendo...';
+        const VALOR_VAZIO = { grau: "", min: "", seg: "", direcao: "", decimal: "", valido: false };
+
+        const $ = id => document.getElementById(id);
+        const normalizarTexto = texto => texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        function setDisplay(elemento, visivel) {
+            elemento.style.display = visivel ? "block" : "none";
+        }
+
+        function mostrarErro(mensagem) {
+            $(SELECTORS.errorText).textContent = mensagem;
+            setDisplay($(SELECTORS.error), true);
+        }
+
+        function atualizarProgresso(percentual) {
+            $(SELECTORS.progressText).textContent = `${percentual}%`;
+            $(SELECTORS.progressFill).style.width = `${percentual}%`;
+        }
+
+        function setProcessando(ativo) {
+            const botao = $(SELECTORS.convertBtn);
+            botao.disabled = ativo;
+            botao.innerHTML = ativo ? BOTAO_PROCESSANDO_HTML : BOTAO_CONVERTER_HTML;
+            setDisplay($(SELECTORS.progressCard), ativo);
+        }
+
+        function criarCoordenadaVazia() {
+            return { ...VALOR_VAZIO };
+        }
+
+        function temValor(valor) {
+            return valor !== null && valor !== undefined && valor.toString().trim() !== "";
+        }
+
+        function sanitizarNomeArquivo(nome) {
+            const limpo = nome.trim().replace(/[<>:"/\\|?*\x00-\x1F]/g, "_");
+            return limpo.toLowerCase().endsWith(".xlsx") ? limpo : `${limpo}.xlsx`;
+        }
+
+        // ======================================================
+        // COLETORES / DETERMINADORES (NORMALIZAÇÃO COMPLETA)
+        // ======================================================
+
+        function limparListaColetores(texto) {
+            
+            if (!texto) return "";
+            
+            let t = texto.toString().trim();
+            
+            t = t.replace(/\s*\|\s*/g, ";");
+            t = t.replace(/\s*;\s*/g, ";");
+            t = t.trim();
+            
+            let partes = t.split(";").filter(p => p.trim() !== "");
+            
+            const temEtAl = partes.some(p => /et\s+al\.?/i.test(p.trim()));
+            
+            if (temEtAl) {
+                const primeiroColetor = partes[0].trim();
+                return primeiroColetor;
+            }
+            
+            return partes.map(p => p.trim()).join("; ");
+        }
+
+        function formatarNomePessoa(nome) {
+
+            if (!nome) return "";
+
+            let n = nome.toString().trim();
+            n = n.replace(/\s+/g, " ");
+
+            let partes = n.split(" ").filter(Boolean);
+
+            let sobrenome = [];
+            let iniciais = [];
+
+            const regexInicial = /^[A-Z](\.[A-Z])*\.?$|^[A-Z]{1,3}$/;
+
+            for (let p of partes) {
+                let limpo = p.replace(/,/g, "");
+                if (regexInicial.test(limpo)) {
+                    iniciais.push(limpo);
+                } else {
+                    sobrenome.push(limpo);
+                }
+            }
+
+            let sobrenomeStr = sobrenome.join(" ");
+
+            let iniciaisStr = iniciais
+                .map(i => {
+                    let letras = i.replace(/\./g, "");
+                    if (letras.length > 3) return i;
+                    return letras.split("").join(".") + ".";
+                })
+                .join(" ");
+
+            if (!sobrenomeStr) return iniciaisStr;
+            if (!iniciaisStr) return sobrenomeStr;
+
+            return `${sobrenomeStr}, ${iniciaisStr}`;
+        }
+
+        function processarPessoas(texto) {
+
+            if (!texto) {
+                return { principal: "", adicionais: "" };
+            }
+
+            const textoLimpo = limparListaColetores(texto);
+            
+            if (!textoLimpo) {
+                return { principal: "", adicionais: "" };
+            }
+
+            const partes = textoLimpo
+                .split(";")
+                .map(t => t.trim())
+                .filter(Boolean);
+
+            if (partes.length === 0) {
+                return { principal: "", adicionais: "" };
+            }
+
+            const principal = formatarNomePessoa(partes[0]);
+            const adicionais = partes
+                .slice(1)
+                .map(formatarNomePessoa)
+                .join("; ");
+
+            return { principal, adicionais };
+        }
+
+        function processarDeterminadores(texto) {
+
+            if (!texto) return "";
+
+            return texto
+                .split(";")
+                .map(t => t.trim())
+                .filter(Boolean)
+                .map(nome => formatarNomePessoa(nome))
+                .join("; ");
+        }
+
+        // ======================================================
+        // PARSE DE COORDENADAS
+        // ======================================================
+
+        function parseCoordenada(coord, tipo) {
+            
+            if (!temValor(coord)) return criarCoordenadaVazia();
+            
+            const valor = coord.toString().trim();
+            
+            const regexGMS = /(\d{1,3})[º°]\s*(\d{1,2})['′]\s*(\d{1,2}(?:[.,]\d+)?)["″']{0,2}\s*([NSEWnsew])/i;
+            const matchGMS = valor.match(regexGMS);
+            
+            if (matchGMS) {
+                const graus = parseInt(matchGMS[1], 10);
+                const minutos = parseInt(matchGMS[2], 10);
+                const segundos = matchGMS[3].replace(",", ".");
+                const direcao = matchGMS[4].toUpperCase();
+                
+                if (tipo === "lat" && !["N", "S"].includes(direcao)) {
+                    return criarCoordenadaVazia();
+                }
+                if (tipo === "long" && !["E", "W"].includes(direcao)) {
+                    return criarCoordenadaVazia();
+                }
+                
+                return {
+                    grau: graus,
+                    min: minutos.toString().padStart(2, "0"),
+                    seg: segundos.toString().replace(".", ","),
+                    direcao: direcao,
+                    decimal: "",
+                    valido: true
+                };
+            }
+            
+            const valorDecimal = parseFloat(valor.replace(",", "."));
+            
+            if (isNaN(valorDecimal)) {
+                return criarCoordenadaVazia();
+            }
+            
+            const abs = Math.abs(valorDecimal);
+            const graus = Math.floor(abs);
+            const minutosDec = (abs - graus) * 60;
+            const minutos = Math.floor(minutosDec);
+            const segundos = (minutosDec - minutos) * 60;
+            const segFormat = segundos.toFixed(1).replace(".", ",");
+            
+            let dir = "";
+            if (tipo === "lat") dir = valorDecimal >= 0 ? "N" : "S";
+            if (tipo === "long") dir = valorDecimal >= 0 ? "E" : "W";
+            
+            return {
+                grau: graus,
+                min: minutos.toString().padStart(2, "0"),
+                seg: segFormat,
+                direcao: dir,
+                decimal: valorDecimal.toString().replace(".", ","),
+                valido: true
+            };
+        }
+
+        // ======================================================
+        // OUTRAS FUNÇÕES
+        // ======================================================
+
+        function adicionarAviso(lista, linha, campo, mensagem, valor = "") {
+            lista.push({
+                linha,
+                campo,
+                mensagem,
+                valor
+            });
+        }
+
+        function limparNumeroColeta(valor) {
+            if (!valor) return "";
+            return valor.toString().trim().replace(/\D/g, "");
+        }
+
+        function capitalizarPrimeiraLetra(texto) {
+            if (!texto) return "";
+            const textoLimpo = texto.toString().trim();
+            return textoLimpo.charAt(0).toUpperCase() + textoLimpo.slice(1);
+        }
+
+        function extrairHabito(texto) {
+            if (!texto) return "";
+            const t = normalizarTexto(texto);
+            const regras = [
+                { termos: ["subarbusto"], valor: "Subarbusto" },
+                { termos: ["arvore", "arboreo", "arborea", "arvpore"], valor: "Árvore" },
+                { termos: ["arvoreta", "arvpreta"], valor: "Árvoreta" },
+                { termos: ["arbusto"], valor: "Arbusto" },
+                { termos: ["erva", "herbacea"], valor: "Erva" },
+                { termos: ["trepadeira", "liana", "volúvel", "voluvel"], valor: "Trepadeira" },
+                { termos: ["epifita"], valor: "Epífita" },
+                { termos: ["palmeira"], valor: "Palmeira" }
+            ];
+            for (let r of regras) {
+                for (let termo of r.termos) {
+                    if (t.includes(termo)) return r.valor;
+                }
+            }
+            return "";
+        }
+
+        function extrairHabitat(texto) {
+            if (!texto) return "";
+            const t = normalizarTexto(texto);
+            const regras = [
+                { termos: ["amazonia"], valor: "Amazônia" },
+                { termos: ["cerrado"], valor: "Cerrado" },
+                { termos: ["mata atlantica"], valor: "Mata Atlântica" },
+                { termos: ["caatinga"], valor: "Caatinga" },
+                { termos: ["pampa"], valor: "Pampa" },
+                { termos: ["pantanal"], valor: "Pantanal" },
+                { termos: ["floresta ombrofila densa"], valor: "Floresta Ombrófila Densa" },
+                { termos: ["floresta ombrofila aberta"], valor: "Floresta Ombrófila Aberta" },
+                { termos: ["floresta ombrofila mista", "mata de araucarias"], valor: "Floresta Ombrófila Mista" },
+                { termos: ["floresta estacional semidecidual", "Semidecidual", "Floresta estacional semidecídua", "semidecídua", "semidecidua"], valor: "Floresta Estacional Semidecidual" },
+                { termos: ["floresta estacional decidual"], valor: "Floresta Estacional Decidual" },
+                { termos: ["floresta estacional sempre verde"], valor: "Floresta Estacional Sempre-Verde" },
+                { termos: ["cerradao"], valor: "Cerradão" },
+                { termos: ["cerrado stricto sensu"], valor: "Cerrado Stricto Sensu" },
+                { termos: ["campo sujo"], valor: "Campo Sujo" },
+                { termos: ["campo limpo"], valor: "Campo Limpo" },
+                { termos: ["campo rupestre"], valor: "Campo Rupestre" },
+                { termos: ["campo gramineo", "campo graminoso"], valor: "Campo Gramíneo" },
+                { termos: ["campo arbustivo"], valor: "Campo Arbustivo" },
+                { termos: ["vereda"], valor: "Vereda" },
+                { termos: ["mata seca"], valor: "Mata Seca" },
+                { termos: ["igapo"], valor: "Igapó" },
+                { termos: ["varzea"], valor: "Várzea" },
+                { termos: ["campinarana"], valor: "Campinarana" },
+                { termos: ["restinga"], valor: "Restinga" },
+                { termos: ["manguezal"], valor: "Manguezal" },
+                { termos: ["campos de altitude"], valor: "Campos de Altitude" },
+                { termos: ["butiazal"], valor: "Butiazal" },
+                { termos: ["banhado"], valor: "Banhado" },
+                { termos: ["pantanal de varzea"], valor: "Pantanal de Várzea" },
+                { termos: ["pantanal de baixada"], valor: "Pantanal de Baixada" },
+                { termos: ["cordilheira"], valor: "Cordilheira (Pantanal)" },
+                { termos: ["capao"], valor: "Capão" },
+                { termos: ["paratudal"], valor: "Paratudal" },
+                { termos: ["salina"], valor: "Salina" },
+                { termos: ["recife de coral"], valor: "Recife de Coral" },
+                { termos: ["duna"], valor: "Duna" },
+                { termos: ["lago costeiro"], valor: "Lago Costeiro" },
+                { termos: ["delta"], valor: "Delta" },
+                { termos: ["cariris novos"], valor: "Cariris Novos" },
+                { termos: ["faixa dos pinhais"], valor: "Faixa dos Pinhais" },
+                { termos: ["planalto das araucarias"], valor: "Planalto das Araucárias" },
+                { termos: ["terra firme"], valor: "Terra Firme" }
+            ];
+            const encontrados = [];
+            for (const r of regras) {
+                for (const termo of r.termos) {
+                    const termoNorm = normalizarTexto(termo);
+                    if (t.includes(termoNorm)) {
+                        encontrados.push(r.valor);
+                        break;
+                    }
+                }
+            }
+            return [...new Set(encontrados)].join("; ");
+        }
+
+        function mostrarAvisos(listaAvisos) {
+            const warningDiv = $(SELECTORS.warning);
+            const warningText = $(SELECTORS.warningText);
+
+            if (listaAvisos.length === 0) {
+                setDisplay(warningDiv, false);
+                return;
+            }
+
+            warningText.replaceChildren();
+
+            listaAvisos.forEach(aviso => {
+                const linha = document.createElement("div");
+                const titulo = document.createElement("strong");
+
+                linha.className = "alert-warning-line";
+                titulo.textContent = `Linha ${aviso.linha}`;
+                linha.append(titulo, ` | ${aviso.campo} | ${aviso.mensagem}`);
+
+                if (aviso.valor) {
+                    const valor = document.createElement("em");
+                    valor.textContent = aviso.valor;
+                    linha.append(" | Valor: ", valor);
+                }
+
+                warningText.appendChild(linha);
+            });
+
+            setDisplay(warningDiv, true);
+        }
+
+        // ======================================================
+        // PROCESSAMENTO PRINCIPAL
+        // ======================================================
+
+        function criarLinhaJabot(row, projeto, lat, lon, col) {
+            return {
+                numtombo: row.catalognumber || "",
+                sufixo: "",
+                family: row.family || "",
+                genus: row.genus || "",
+                cf: "",
+                sp1: row.species || "",
+                author1: row.scientificnameauthor || "",
+                country: row.country || "",
+                majorarea: row.stateprovince || "",
+                minorarea: row.county || "",
+                gazetteer: row.locality || "",
+                latitude: row.verbatimlatitude || "",
+                longitude: row.verbatimlongitude || "",
+                lat_grau: lat.grau,
+                lat_min: lat.min,
+                lat_seg: lat.seg,
+                ns: lat.direcao,
+                long_grau: lon.grau,
+                long_min: lon.min,
+                long_seg: lon.seg,
+                ew: lon.direcao,
+                collector: col.principal,
+                addcoll: col.adicionais,
+                number: limparNumeroColeta(row.collectornumber),
+                colldd: row.daycollected || "",
+                collmm: row.monthcollected || "",
+                collyy: row.yearcollected || "",
+                detby: processarDeterminadores(row.identifiedby),
+                detdd: row.dayidentified || "",
+                detmm: row.monthidentified || "",
+                detyy: row.yearidentified || "",
+                sigla_colbot_origem: row.collectioncode || "",
+                notes: capitalizarPrimeiraLetra(row.notes),
+                projeto,
+                habito: extrairHabito(row.notes),
+                habitat: extrairHabitat(row.notes),
+            };
+        }
+
+        function validarLinha(row, linha, lat, lon, avisos) {
+            if (!temValor(row.species)) {
+                adicionarAviso(avisos, linha, "species", "Campo vazio");
+            }
+
+            if (temValor(row.verbatimlatitude) && !lat.valido) {
+                adicionarAviso(avisos, linha, "latitude", "Coordenada inválida", row.verbatimlatitude);
+            }
+
+            if (temValor(row.verbatimlongitude) && !lon.valido) {
+                adicionarAviso(avisos, linha, "longitude", "Coordenada inválida", row.verbatimlongitude);
+            }
+
+            if (Number(row.verbatimlatitude) === 0 && Number(row.verbatimlongitude) === 0) {
+                adicionarAviso(avisos, linha, "coordenadas", "Coordenada 0,0 suspeita");
+            }
+
+            if (row.collector && row.collector.length < 3) {
+                adicionarAviso(avisos, linha, "collector", "Nome de coletor muito curto", row.collector);
+            }
+
+            if (row.collectornumber && /\D/.test(row.collectornumber.toString()) && /\d/.test(row.collectornumber.toString())) {
+                adicionarAviso(avisos, linha, "number", "Texto removido do número de coleta", row.collectornumber);
+            }
+        }
+
+        function processar() {
+            const fileInput = $(SELECTORS.arquivo);
+            const projeto = $(SELECTORS.projeto).value.trim();
+            const nomeArquivoInput = $(SELECTORS.nomeArquivo).value.trim() || `JABOT_${projeto || "convertido"}.xlsx`;
+
+            setDisplay($(SELECTORS.error), false);
+            setDisplay($(SELECTORS.warning), false);
+            atualizarProgresso(0);
+
+            if (!fileInput.files.length) {
+                mostrarErro("Selecione um arquivo.");
+                return;
+            }
+            if (!projeto) {
+                mostrarErro("Informe o nome do projeto.");
+                return;
+            }
+
+            setProcessando(true);
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+
+                    const out = [];
+                    const avisos = [];
+
+                    json.forEach((row, i) => {
+                        const lat = parseCoordenada(row.verbatimlatitude, "lat");
+                        const lon = parseCoordenada(row.verbatimlongitude, "long");
+                        const col = processarPessoas(row.collector);
+
+                        validarLinha(row, i + 2, lat, lon, avisos);
+
+                        out.push(criarLinhaJabot(row, projeto, lat, lon, col));
+                        
+                        const percent = Math.round(((i + 1) / json.length) * 100);
+                        atualizarProgresso(percent);
+                    });
+
+                    const ws = XLSX.utils.json_to_sheet(out, { header: colunasJabot });
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "JABOT");
+
+                    XLSX.writeFile(wb, sanitizarNomeArquivo(nomeArquivoInput));
+
+                    mostrarAvisos(avisos);
+
+                    alert(
+                        `✅ Conversão concluída!\n\n` +
+                        `📊 Linhas processadas: ${out.length}\n` +
+                        `⚠️ Avisos encontrados: ${avisos.length}`
+                    );
+                } catch (erro) {
+                    mostrarErro(`Não foi possível converter o arquivo. Verifique se a planilha está no formato esperado. Detalhe: ${erro.message}`);
+                } finally {
+                    setProcessando(false);
+                }
+            };
+
+            reader.onerror = function() {
+                mostrarErro("Não foi possível ler o arquivo selecionado.");
+                setProcessando(false);
+            };
+
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            $(SELECTORS.convertBtn).addEventListener("click", processar);
+        });
+    </script>
+</body>
+</html>
