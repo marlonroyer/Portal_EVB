@@ -47,7 +47,7 @@ const tools = [
         accepts: "PDFs A4 gerados pelo JABOT com 44 códigos por página, organizados em 4 colunas e 11 linhas.",
         output: "Arquivo .zip com imagens .png recortadas e nomeadas automaticamente pelo código EVB do exemplar.",
         status: "Estavel",
-        version: "2.0",
+        version: "2.1",
         path: "tools/Jabot_Extract/index.html",
         exampleLabel: "PDF exemplo",
         exampleUrl: "exemplos/jabot-extract-codigos-barras.pdf"
@@ -73,7 +73,7 @@ const tools = [
         accepts: "Planilha-mapa da coleção em .xls, .xlsx ou .csv, com caixas, famílias e intervalos armazenados.",
         output: "PDF com as etiquetas de caixas selecionadas, pronto para impressão e substituição das etiquetas antigas.",
         status: "Estavel",
-        version: "2.0",
+        version: "2.2",
         path: "tools/EVB_Labels_Collection/index.html",
         exampleLabel: "Planilha exemplo",
         exampleUrl: "exemplos/evb-labels-collection-dados.xlsx"
@@ -86,7 +86,7 @@ const tools = [
         accepts: "Planilhas no modelo JABOT ou dados próprios organizados com campos botânicos, taxonômicos, geográficos e curatoriais.",
         output: "Painel analítico com estatísticas, completude, listas por família, mapas, gráficos e relatório textual padronizado.",
         status: "Estavel",
-        version: "2.0",
+        version: "2.1",
         path: "tools/Analise_Botanica/analise-botanica.html",
         exampleLabel: "Planilha exemplo",
         exampleUrl: "exemplos/evb-labels-dados-etiquetas.xlsx"
