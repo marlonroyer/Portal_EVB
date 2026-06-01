@@ -645,7 +645,7 @@ const infoPages = [
         summary: "Guia rápido para entender a ordem recomendada de uso, arquivos esperados, exemplos disponíveis e erros comuns de cada ferramenta.",
         body: [
             "Esta aba organiza o uso das ferramentas do Portal EVB como um fluxo de etapas. Os arquivos de exemplo ficam na pasta exemplos/ e podem ser substituídos por modelos reais quando você separar os materiais.",
-            "Para baixar um arquivo modelo (indisponiveis no momento, ainda em processo), use os botões indicados em cada ferramenta."
+            "Para baixar um arquivo modelo, use os botões indicados em cada ferramenta."
         ],
         help: toolHelp,
         image: "",
